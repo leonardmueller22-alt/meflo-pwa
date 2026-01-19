@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<title>Meflo – Mini Game</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="style.css" />
+
+<style>
+.rating-view {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+}
+
+.game-wrapper {
+  margin-top: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.game-container {
+  position: relative;
+  width: 160%;
+  max-width: 490px;
+  height: 500px;
+  background: #111;
+  border-radius: 16px;
+  overflow: hidden;
+  margin-top: 2rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+
+.ball {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-radius: 50%;
+}
+
+.paddle {
+  position: absolute;
+  bottom: 20px;
+  width: 100px;
+  height: 12px;
+  background: #317EFB;
+  border-radius: 6px;
+}
+
+.score {
+  color: white;
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.game-over {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.game-over button {
+  padding: 0.7rem 1.2rem;
+  border-radius: 10px;
+  border: none;
+  background: #317EFB;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="logo-symbol" onclick="window.location.href='index.html'">
+    <span class="sigil">◆</span>
+    <span class="name">MEFLO</span>
+  </div>
+</header>
+
+<main class="rating-view">
+<div class="game-wrapper">
+
+<h1 style="color:white;">Mini-Game 🎮</h1>
+
+<div class="game-container" id="game">
+  <div class="ball" id="ball"></div>
+  <div class="paddle" id="paddle"></div>
+
+  <div class="game-over" id="gameOver">
+    <h2>Game Over 💥</h2>
+    <p id="finalScore"></p>
+    <button onclick="startGame()">Nochmal spielen</button>
+  </div>
+</div>
+
+<div class="score">
+  Score: <span id="score">0</span>
+</div>
+
+</div>
+</main>
+
+<button class="back-btn" onclick="window.location.href='index.html'">
+← Zurück zur Startseite
+</button>
+
+<script>
+/* 🔊 AUDIO SETUP */
+let audioCtx = null;
+
+function unlockAudio() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+}
+
+document.addEventListener("keydown", unlockAudio, { once: true });
+document.addEventListener("touchstart", unlockAudio, { once: true });
+
+/* 🔔 PING SOUND */
+function playPing() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = "square";
+  osc.frequency.value = 800;
+
+  gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.08);
+}
+
+/* 🎮 GAME OVER SOUND (schön & klassisch) */
+function playGameOverSound() {
+  if (!audioCtx) return;
+
+  const now = audioCtx.currentTime;
+
+  function tone(start, end, t) {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(start, t);
+    osc.frequency.exponentialRampToValueAtTime(end, t + 0.4);
+
+    gain.gain.setValueAtTime(0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(t);
+    osc.stop(t + 0.4);
+  }
+
+  tone(440, 260, now);
+  tone(260, 140, now + 0.45);
+}
+
+/* 🎮 GAME LOGIC */
+const game = document.getElementById("game");
+const ball = document.getElementById("ball");
+const paddle = document.getElementById("paddle");
+const scoreEl = document.getElementById("score");
+const gameOverEl = document.getElementById("gameOver");
+const finalScoreEl = document.getElementById("finalScore");
+
+let ballX, ballY, vx, vy;
+let paddleX;
+let score = 0;
+let running = true;
+
+const START_SPEED = 1.8;
+const SPEED_FACTOR = 1.06;
+
+function startGame() {
+  score = 0;
+  scoreEl.textContent = "0";
+  running = true;
+  gameOverEl.style.display = "none";
+
+  ballX = game.clientWidth / 2;
+  ballY = game.clientHeight / 2;
+  vx = START_SPEED * (Math.random() > 0.5 ? 1 : -1);
+  vy = START_SPEED;
+
+  paddleX = (game.clientWidth - paddle.clientWidth) / 2;
+  paddle.style.left = paddleX + "px";
+
+  requestAnimationFrame(loop);
+}
+
+function loop() {
+  if (!running) return;
+
+  ballX += vx;
+  ballY += vy;
+
+  if (ballX <= 0 || ballX + 14 >= game.clientWidth) {
+    vx *= -1;
+  }
+
+  if (ballY <= 0) {
+    vy *= -1;
+  }
+
+  const paddleTop = game.clientHeight - 32;
+  if (
+    ballY + 14 >= paddleTop &&
+    ballX + 14 >= paddleX &&
+    ballX <= paddleX + paddle.clientWidth
+  ) {
+    vy = -Math.abs(vy);
+    score++;
+    scoreEl.textContent = score;
+    vx *= SPEED_FACTOR;
+    vy *= SPEED_FACTOR;
+    playPing(); // 🔊 Treffer-Sound
+  }
+
+  if (ballY > game.clientHeight) {
+    running = false;
+    finalScoreEl.textContent = `Dein Score: ${score}`;
+    gameOverEl.style.display = "flex";
+    playGameOverSound(); // 🔊 Game-Over-Sound
+    return;
+  }
+
+  ball.style.left = ballX + "px";
+  ball.style.top = ballY + "px";
+  paddle.style.left = paddleX + "px";
+
+  requestAnimationFrame(loop);
+}
+
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowLeft") paddleX -= 24;
+  if (e.key === "ArrowRight") paddleX += 24;
+  paddleX = Math.max(0, Math.min(game.clientWidth - paddle.clientWidth, paddleX));
+});
+
+game.addEventListener("touchmove", e => {
+  const rect = game.getBoundingClientRect();
+  paddleX = e.touches[0].clientX - rect.left - paddle.clientWidth / 2;
+  paddleX = Math.max(0, Math.min(game.clientWidth - paddle.clientWidth, paddleX));
+});
+
+startGame();
+</script>
+
+</body>
+</html>

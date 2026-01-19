@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meflo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Header / Logo -->
+  <header class="header">
+    <div class="logo-symbol" onclick="goHome()">
+      <span class="sigil">◆</span>
+      <span class="name">MEFLO</span>
+    </div>
+  </header>
+
+  <!-- LOGIN -->
+  <main class="container" id="loginView">
+    <div class="card">
+      <h1>Herzlich willkommen 👋</h1>
+      <p>Bitte melde dich bei <strong>Meflo</strong> an</p>
+
+      <form id="loginForm">
+        <input id="username" type="text" placeholder="Username" required />
+        <input id="password" type="password" placeholder="Passwort" required />
+        <button type="submit">Abschicken</button>
+      </form>
+
+      <p id="error" style="color:red; display:none; margin-top:1rem;">
+        Falsche Anmeldedaten
+      </p>
+    </div>
+  </main>
+
+  <!-- STARTSEITE -->
+  <main class="home" id="homeView" style="display:none;">
+    <h1 class="home-title">Willkommen bei Meflo 🚀</h1>
+
+    <div class="home-image">
+      <img src="assets/team.png" alt="Meflo Team">
+    </div>
+
+    <div class="tile-container">
+      <div class="tile" onclick="window.location.href='powerpoint.html'">
+        PowerPoint<br>Handout<br>Download
+      </div>
+
+      <div class="tile tile-secondary" onclick="window.location.href='fragezeichen.html'">
+        Mini-Game 🎮
+      </div>
+
+      <div class="tile tile-success" onclick="window.location.href='bewertung.html'">
+        Bewertung
+      </div>
+    </div>
+  </main>
+
+  <!-- SCRIPT -->
+  <script>
+    const views = ["loginView", "homeView"];
+
+    function showView(id) {
+      views.forEach(v => {
+        document.getElementById(v).style.display = "none";
+      });
+      document.getElementById(id).style.display = "flex";
+    }
+
+    function goHome() {
+      if (sessionStorage.getItem("loggedIn") === "true") {
+        showView("homeView");
+      } else {
+        showView("loginView");
+      }
+    }
+
+    // ✅ NUR BEI CMD+R (Reload) ausloggen
+    (function handleReloadLogout() {
+      const navEntry = performance.getEntriesByType("navigation")[0];
+      const navType = navEntry ? navEntry.type : "navigate"; // fallback
+
+      if (navType === "reload") {
+        sessionStorage.removeItem("loggedIn");
+      }
+    })();
+
+    // 🔁 Beim Laden: je nach Login-Status View setzen
+    if (sessionStorage.getItem("loggedIn") === "true") {
+      showView("homeView");
+    } else {
+      showView("loginView");
+    }
+
+    // 🔐 LOGIN
+    const form = document.getElementById("loginForm");
+    const error = document.getElementById("error");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      if (username === "Admin" && password === "Affe12345") {
+        sessionStorage.setItem("loggedIn", "true");
+        showView("homeView");
+
+        if (Notification.permission === "granted") {
+          navigator.serviceWorker.controller?.postMessage({
+            type: "LOGIN_SUCCESS"
+          });
+        }
+      } else {
+        error.style.display = "block";
+      }
+    });
+
+    // 🔧 SERVICE WORKER
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("sw.js");
+    }
+
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  </script>
+
+</body>
+</html>

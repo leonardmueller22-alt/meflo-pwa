@@ -1,0 +1,295 @@
+/* =========================
+   RESET & BASIS
+========================= */
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #317EFB, #6AA8FF);
+  color: #333;
+  overflow: hidden; /* kein Scrollen für Login & Startseite */
+}
+
+/* =========================
+   HEADER / LOGO
+========================= */
+
+.header {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+}
+
+.logo-symbol {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  cursor: pointer;
+}
+
+.logo-symbol .sigil {
+  font-size: 1.4rem;
+  opacity: 0.9;
+}
+
+.logo-symbol .name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+input {
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+input:focus {
+  outline: none;
+  border-color: #317EFB;
+}
+
+button {
+  padding: 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: #317EFB;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #bbb;
+  cursor: not-allowed;
+}
+
+/* =========================
+   STARTSEITE
+========================= */
+
+.home {
+  position: relative;
+  min-height: 100vh;
+  padding: 2rem;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.home-title {
+  text-align: center;
+  font-size: 2.4rem;
+  margin-top: 3.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* =========================
+   BILD
+========================= */
+
+.home-image {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.6rem;
+  width: 100%;
+}
+
+.home-image img {
+  max-width: 720px;
+  width: 85%;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+/* =========================
+   KACHELN
+========================= */
+
+.tile-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+
+  max-width: 720px;
+  width: 85%;
+  margin: 0 auto;
+}
+
+.tile {
+  background: white;
+  color: #317EFB;
+
+  padding: 1.2rem 1rem;
+  border-radius: 14px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+
+  cursor: pointer;
+  user-select: none;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.18);
+}
+
+.tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 30px rgba(0,0,0,0.25);
+}
+
+.tile-secondary {
+  color: #aaa;
+}
+
+.tile-success {
+  color: #2ecc71;
+}
+
+/* =========================
+   ZURÜCK-BUTTON
+========================= */
+
+.back-btn {
+  position: fixed;      /* ✅ WICHTIG: IMMER LINKS UNTEN */
+  bottom: 24px;
+  left: 24px;
+
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.9);
+
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  opacity: 0.7;
+}
+
+/* =========================
+   BEWERTUNGSSEITE
+========================= */
+
+/* Hier erlauben wir Scrollen */
+.rating-view {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+}
+
+.rating-card {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.rating-card h1 {
+  font-size: 1.3rem;
+  margin-bottom: 0.5rem;
+}
+
+.rating-card p {
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+/* Sterne */
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.rating-stars span {
+  color: #ddd;
+  transition: color 0.2s;
+}
+
+.rating-stars span.active {
+  color: #f5b301;
+}
+
+/* Textfeld */
+.rating-card textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  margin-bottom: 1.5rem;
+  resize: none;
+}
+
+.rating-card textarea:focus {
+  outline: none;
+  border-color: #317EFB;
+}
+
+/* Button */
+.rating-card button {
+  width: 100%;
+  padding: 0.9rem;
+  border-radius: 10px;
+  border: none;
+  background: #317EFB;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.rating-card button:disabled {
+  background: #bbb;
+  cursor: not-allowed;
+}

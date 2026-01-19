@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Meflo – Bewertung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo-symbol" onclick="window.location.href='index.html'">
+      <span class="sigil">◆</span>
+      <span class="name">MEFLO</span>
+    </div>
+  </header>
+
+  <!-- Bewertung -->
+  <main class="rating-view">
+    <div class="rating-card">
+
+      <h1>Wir würden uns sehr über eine Bewertung freuen</h1>
+      <p>Wie fandest du die Präsentation?</p>
+
+      <div class="rating-stars" id="stars">
+        <span data-value="1">★</span>
+        <span data-value="2">★</span>
+        <span data-value="3">★</span>
+        <span data-value="4">★</span>
+        <span data-value="5">★</span>
+      </div>
+
+      <textarea
+        placeholder="Optional: Möchtest du uns noch etwas mitteilen?"
+        rows="4"
+      ></textarea>
+
+      <button id="submitBtn" disabled>Abschicken</button>
+
+    </div>
+  </main>
+
+  <!-- Zurück -->
+  <button class="back-btn" onclick="window.location.href='index.html'">
+    ← Zurück zur Startseite
+  </button>
+
+  <script>
+    let selectedRating = 0;
+    const stars = document.querySelectorAll(".rating-stars span");
+    const button = document.getElementById("submitBtn");
+
+    stars.forEach(star => {
+      star.addEventListener("mouseover", () => {
+        highlightStars(star.dataset.value);
+      });
+
+      star.addEventListener("mouseout", () => {
+        highlightStars(selectedRating);
+      });
+
+      star.addEventListener("click", () => {
+        selectedRating = star.dataset.value;
+        highlightStars(selectedRating);
+        button.disabled = false;
+      });
+    });
+
+    function highlightStars(count) {
+      stars.forEach(star => {
+        star.classList.toggle(
+          "active",
+          star.dataset.value <= count
+        );
+      });
+    }
+
+    button.addEventListener("click", async () => {
+      if ("serviceWorker" in navigator) {
+        const reg = await navigator.serviceWorker.ready;
+        reg.showNotification("Meflo", {
+          body: "Danke für deine Bewertung ⭐",
+          icon: "icons/icon-192.png"
+        });
+      }
+
+      button.textContent = "Danke 🙌";
+      button.disabled = true;
+    });
+  </script>
+
+</body>
+</html>
